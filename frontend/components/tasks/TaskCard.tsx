@@ -5,9 +5,10 @@ import { Draggable } from "@hello-pangea/dnd";
 interface TaskCardProps {
   task: Task;
   index: number;
+  onClick: () => void;
 }
 
-export function TaskCard({ task, index }: TaskCardProps) {
+export function TaskCard({ task, index, onClick }: TaskCardProps) {
   // Mocks for data we haven't added to the DB yet
   const mockDueDate = task.dueDate || "12 Sep 2026";
   const mockRole = "Admin";
@@ -20,6 +21,7 @@ export function TaskCard({ task, index }: TaskCardProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          onClick={onClick}
           className={`bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer group flex flex-col gap-3 ${
             snapshot.isDragging ? "shadow-lg opacity-80 rotate-2" : ""
           }`}

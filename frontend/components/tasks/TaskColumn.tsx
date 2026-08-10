@@ -7,9 +7,10 @@ interface TaskColumnProps {
   title: string;
   statusId: string;
   tasks: Task[];
+  onTaskClick: (task: Task) => void;
 }
 
-export function TaskColumn({ title, statusId, tasks }: TaskColumnProps) {
+export function TaskColumn({ title, statusId, tasks, onTaskClick }: TaskColumnProps) {
   return (
     <div className="flex flex-col w-[340px] shrink-0 p-1">
       <div className="flex justify-between items-center mb-4 px-1">
@@ -39,7 +40,12 @@ export function TaskColumn({ title, statusId, tasks }: TaskColumnProps) {
             className="flex flex-col space-y-3 flex-1 overflow-y-auto min-h-[150px]"
           >
             {tasks.map((task, index) => (
-              <TaskCard key={task.id} task={task} index={index} />
+              <TaskCard 
+                key={task.id} 
+                task={task} 
+                index={index} 
+                onClick={() => onTaskClick(task)}
+              />
             ))}
             {provided.placeholder}
           </div>

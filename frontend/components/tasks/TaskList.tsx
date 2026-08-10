@@ -30,7 +30,7 @@ const formatDate = (isoString: string | null) => {
 };
 
 // Sub-component for the collapsible groups
-const TaskGroup = ({ title, tasks }: { title: string; tasks: Task[] }) => {
+const TaskGroup = ({ title, tasks, onTaskClick }: { title: string; tasks: Task[], onTaskClick: (task: Task) => void }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -58,7 +58,11 @@ const TaskGroup = ({ title, tasks }: { title: string; tasks: Task[] }) => {
               <div className="p-4 text-sm text-muted-foreground text-center">No tasks in this list.</div>
             ) : (
               tasks.map(task => (
-                <div key={task.id} className="grid grid-cols-12 gap-4 p-3 items-center hover:bg-muted/30 transition-colors">
+                <div 
+                  key={task.id} 
+                  onClick={() => onTaskClick(task)}
+                  className="grid grid-cols-12 gap-4 p-3 items-center hover:bg-muted/30 transition-colors cursor-pointer"
+                >
                   <div className="col-span-6 text-sm font-medium text-foreground truncate">
                     {task.title}
                   </div>
@@ -96,7 +100,7 @@ const TaskGroup = ({ title, tasks }: { title: string; tasks: Task[] }) => {
   );
 };
 
-export function TaskList({ tasks }: { tasks: Task[] }) {
+export function TaskList({ tasks, onTaskClick }: { tasks: Task[], onTaskClick: (task: Task) => void }) {
   const todoTasks = tasks.filter(t => t.status === "TODO");
   const doingTasks = tasks.filter(t => t.status === "IN_PROGRESS");
   const completedTasks = tasks.filter(t => t.status === "DONE");
@@ -104,10 +108,10 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
 
   return (
     <div className="flex flex-col w-full overflow-y-auto pr-2 pb-4 h-[calc(100vh-180px)]">
-      <TaskGroup title="To Do" tasks={todoTasks} />
-      <TaskGroup title="Doing" tasks={doingTasks} />
-      <TaskGroup title="Completed" tasks={completedTasks} />
-      <TaskGroup title="On Hold" tasks={onHoldTasks} />
+      <TaskGroup title="To Do" tasks={todoTasks} onTaskClick={onTaskClick} />
+      <TaskGroup title="Doing" tasks={doingTasks} onTaskClick={onTaskClick} />
+      <TaskGroup title="Completed" tasks={completedTasks} onTaskClick={onTaskClick} />
+      <TaskGroup title="On Hold" tasks={onHoldTasks} onTaskClick={onTaskClick} />
     </div>
   );
 }

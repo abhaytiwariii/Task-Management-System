@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
-import { useTaskStore } from "../store/useTaskStore";
+import { useTaskStore, Task } from "../store/useTaskStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { TaskColumn } from "../components/tasks/TaskColumn";
 import { TaskList } from "../components/tasks/TaskList";
 import { CreateTaskModal } from "../components/tasks/CreateTaskModal";
+import { TaskDetailsModal } from "../components/tasks/TaskDetailsModal";
 import { BoardDndContext } from "../components/tasks/BoardDndContext";
 import { LayoutGrid, List as ListIcon, Filter, Search, Plus } from "lucide-react";
 import { DropResult } from "@hello-pangea/dnd";
@@ -20,6 +21,7 @@ export default function Home() {
   // New state for view mode
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
     if (userId) fetchTasks();
@@ -109,20 +111,27 @@ export default function Home() {
       {viewMode === "board" ? (
         <BoardDndContext onDragEnd={handleDragEnd}>
           <div className="flex space-x-6 overflow-x-auto pb-4 h-[calc(100vh-180px)] items-start">
-            <TaskColumn title="To Do" statusId="TODO" tasks={todoTasks} />
-            <TaskColumn title="Doing" statusId="IN_PROGRESS" tasks={doingTasks} />
-            <TaskColumn title="Completed" statusId="DONE" tasks={completedTasks} />
-            <TaskColumn title="On Hold" statusId="ON_HOLD" tasks={onHoldTasks} />
+            <TaskColumn title="To Do" statusId="TODO" tasks={todoTasks} onTaskClick={setSelectedTask} />
+            <TaskColumn title="Doing" statusId="IN_PROGRESS" tasks={doingTasks} onTaskClick={setSelectedTask} />
+            <TaskColumn title="Completed" statusId="DONE" tasks={completedTasks} onTaskClick={setSelectedTask} />
+            <TaskColumn title="On Hold" statusId="ON_HOLD" tasks={onHoldTasks} onTaskClick={setSelectedTask} />
           </div>
         </BoardDndContext>
       ) : (
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} onTaskClick={setSelectedTask} />
       )}
 
       {/* Create Task Modal */}
       <CreateTaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Task Details Modal */}
+      <TaskDetailsModal 
+        task={selectedTask} 
+        isOpen={!!selectedTask} 
+        onClose={() => setSelectedTask(null)} 
       />
     </AppLayout>
   );
