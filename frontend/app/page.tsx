@@ -5,18 +5,43 @@ import { AppLayout } from "../components/layout/AppLayout";
 import { useTaskStore } from "../store/useTaskStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { TaskColumn } from "../components/tasks/TaskColumn";
+import { TaskList } from "../components/tasks/TaskList";
 import { CreateTaskModal } from "../components/tasks/CreateTaskModal";
+import { BoardDndContext } from "../components/tasks/BoardDndContext";
 import { LayoutGrid, List as ListIcon, Filter, Search, Plus } from "lucide-react";
+import { DropResult } from "@hello-pangea/dnd";
 
 export default function Home() {
   const fetchTasks = useTaskStore((state) => state.fetchTasks);
+  const updateTaskStatus = useTaskStore((state) => state.updateTaskStatus);
   const tasks = useTaskStore((state) => state.tasks);
   const userId = useAuthStore((state) => state.userId);
+  
+  // New state for view mode
+  const [viewMode, setViewMode] = useState<"board" | "list">("board");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (userId) fetchTasks();
   }, [userId, fetchTasks]);
+
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+    
+    // If dropped outside a valid valid column droppable area
+    if (!destination) return;
+
+    // If dropped in the exact same column and position
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    // Trigger optimistic update + backend API call
+    updateTaskStatus(draggableId, destination.droppableId);
+  };
 
   // Group tasks by status
   const todoTasks = tasks.filter((t) => t.status === "TODO");
@@ -40,12 +65,27 @@ export default function Home() {
             />
           </div>
 
+          {/* View Toggle Buttons */}
           <div className="flex bg-muted p-1 rounded-lg border border-border">
-            <button className="px-3 py-1 bg-background shadow-sm rounded-md text-sm font-medium flex items-center">
+            <button 
+              onClick={() => setViewMode("board")}
+              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
+                viewMode === "board" 
+                  ? "bg-background shadow-sm text-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
               <LayoutGrid className="h-4 w-4 mr-2" />
               Board
             </button>
-            <button className="px-3 py-1 text-muted-foreground rounded-md text-sm font-medium flex items-center hover:text-foreground">
+            <button 
+              onClick={() => setViewMode("list")}
+              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
+                viewMode === "list" 
+                  ? "bg-background shadow-sm text-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
               <ListIcon className="h-4 w-4 mr-2" />
               List
             </button>
@@ -65,13 +105,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Kanban Board Layout */}
-      <div className="flex space-x-6 overflow-x-auto pb-4 h-[calc(100vh-180px)] items-start">
-        <TaskColumn title="To Do" tasks={todoTasks} />
-        <TaskColumn title="Doing" tasks={doingTasks} />
-        <TaskColumn title="Completed" tasks={completedTasks} />
-        <TaskColumn title="On Hold" tasks={onHoldTasks} />
-      </div>
+      {/* Conditional Rendering based on viewMode */}
+      {viewMode === "board" ? (
+        <BoardDndContext onDragEnd={handleDragEnd}>
+          <div className="flex space-x-6 overflow-x-auto pb-4 h-[calc(100vh-180px)] items-start">
+            <TaskColumn title="To Do" statusId="TODO" tasks={todoTasks} />
+            <TaskColumn title="Doing" statusId="IN_PROGRESS" tasks={doingTasks} />
+            <TaskColumn title="Completed" statusId="DONE" tasks={completedTasks} />
+            <TaskColumn title="On Hold" statusId="ON_HOLD" tasks={onHoldTasks} />
+          </div>
+        </BoardDndContext>
+      ) : (
+        <TaskList tasks={tasks} />
+      )}
 
       {/* Create Task Modal */}
       <CreateTaskModal
@@ -81,7 +127,3 @@ export default function Home() {
     </AppLayout>
   );
 }
-
-
-
-

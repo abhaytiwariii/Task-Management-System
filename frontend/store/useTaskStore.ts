@@ -21,6 +21,7 @@ interface TaskState {
   fetchTasks: () => Promise<void>;
   addTask: (data: Partial<Task>) => Promise<void>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
+  updateTaskStatus: (id: string, newStatus: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
 }
 
@@ -63,6 +64,25 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
       }));
     } catch (error) {
       console.error("Failed to update task:", error);
+    }
+  },
+
+  updateTaskStatus: async (id, newStatus) => {
+    // 1. Snapshot previous state for rollback
+    const previousTasks = get().tasks;
+    
+    // 2. Optimistic update
+    set((state) => ({
+      tasks: state.tasks.map((t) => (t.id === id ? { ...t, status: newStatus } : t)),
+    }));
+
+    // 3. API Call
+    try {
+      await api.patch(`/tasks/${id}`, { status: newStatus });
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+      // 4. Revert on error
+      set({ tasks: previousTasks });
     }
   },
 

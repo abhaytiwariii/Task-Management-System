@@ -1,13 +1,15 @@
 import { Plus, MoreHorizontal } from "lucide-react";
 import { TaskCard } from "./TaskCard";
 import { Task } from "../../store/useTaskStore";
+import { Droppable } from "@hello-pangea/dnd";
 
 interface TaskColumnProps {
   title: string;
+  statusId: string;
   tasks: Task[];
 }
 
-export function TaskColumn({ title, tasks }: TaskColumnProps) {
+export function TaskColumn({ title, statusId, tasks }: TaskColumnProps) {
   return (
     <div className="flex flex-col w-[340px] shrink-0 p-1">
       <div className="flex justify-between items-center mb-4 px-1">
@@ -29,11 +31,20 @@ export function TaskColumn({ title, tasks }: TaskColumnProps) {
         </div>
       </div>
 
-      <div className="flex flex-col space-y-3 flex-1 overflow-y-auto min-h-[150px]">
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
-        ))}
-      </div>
+      <Droppable droppableId={statusId}>
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="flex flex-col space-y-3 flex-1 overflow-y-auto min-h-[150px]"
+          >
+            {tasks.map((task, index) => (
+              <TaskCard key={task.id} task={task} index={index} />
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
 
       <button className="mt-3 flex items-center text-muted-foreground hover:text-foreground text-sm py-2 px-1 transition-colors w-full cursor-pointer">
         <Plus className="h-4 w-4 mr-2" />
