@@ -8,11 +8,12 @@ export interface Task {
   description: string | null;
   status: string;
   priority: string | null;
+  dueDate: string | null;
+  labels: string[];
+  assignee: string | null;
   createdAt: string;
-  dueDate?: string | null;
-  labels?: string[];
-  members?: string[];
 }
+
 
 interface TaskState {
   tasks: Task[];

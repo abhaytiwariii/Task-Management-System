@@ -16,13 +16,16 @@ model User {
 }
 
 model Task {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
-  status      String   @default("TODO") // e.g., TODO, IN_PROGRESS, DONE
-  priority    String?  // e.g., LOW, MEDIUM, HIGH
+  status      String    @default("TODO") // e.g., TODO, IN_PROGRESS, DONE
+  priority    String?   // e.g., LOW, MEDIUM, HIGH
+  dueDate     DateTime? // Added for the date badge
+  labels      String[]  @default([]) // Added for tags like "Deployment"
+  assignee    String?   // Added for the member avatar
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

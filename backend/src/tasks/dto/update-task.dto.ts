@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsArray, IsDateString } from 'class-validator';
 
 export class UpdateTaskDto {
   @IsString()
@@ -16,4 +16,18 @@ export class UpdateTaskDto {
   @IsString()
   @IsOptional()
   priority?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  labels?: string[];
+
+  @IsString()
+  @IsOptional()
+  assignee?: string;
 }
+
