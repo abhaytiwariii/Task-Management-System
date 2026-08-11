@@ -1,4 +1,5 @@
 import { MoreHorizontal, Calendar, Tag } from "lucide-react";
+import Image from "next/image";
 import { Task } from "../../store/useTaskStore";
 import { Draggable } from "@hello-pangea/dnd";
 
@@ -39,9 +40,11 @@ export function TaskCard({ task, index, onClick }: TaskCardProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {/* Avatar Placeholder */}
-              <img
+              <Image
                 src="https://api.dicebear.com/7.x/notionists/svg?seed=Admin&backgroundColor=f43f5e"
                 alt="Admin"
+                width={24}
+                height={24}
                 className="w-6 h-6 rounded-full border border-border bg-primary"
               />
               <span className="text-xs font-medium text-foreground">{mockRole}</span>

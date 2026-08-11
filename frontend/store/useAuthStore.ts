@@ -7,6 +7,8 @@ interface AuthState {
   isHydrated: boolean;
   setHydrated: () => void;
   initializeGuest: () => Promise<void>;
+  setUserId: (id: string) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -15,6 +17,8 @@ export const useAuthStore = create<AuthState>()(
       userId: null,
       isHydrated: false,
       setHydrated: () => set({ isHydrated: true }),
+      setUserId: (id: string) => set({ userId: id }),
+      logout: () => set({ userId: null }),
       initializeGuest: async () => {
         if (get().userId) return; // Already logged in
 

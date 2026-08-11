@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { LayoutGrid, FolderKanban, CheckSquare, Settings, ChevronDown } from "lucide-react";
+import { LayoutGrid, FolderKanban, Settings, ChevronDown } from "lucide-react";
+import Image from "next/image";
 import { ThemeToggle } from "../ThemeToggle";
-
 
 export function Sidebar() {
   return (
@@ -12,9 +12,11 @@ export function Sidebar() {
         {/* User Profile Dropdown */}
         <div className="flex items-center justify-between cursor-pointer hover:bg-sidebar-hover p-2 rounded-lg transition-colors -mx-2">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src="https://api.dicebear.com/7.x/notionists/svg?seed=Dexter&backgroundColor=b6e3f4"
               alt="Dexter"
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full border border-border"
             />
             <span className="font-medium text-sm">Dexter</span>

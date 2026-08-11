@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "../components/layout/AppLayout";
 import { useTaskStore, Task } from "../store/useTaskStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -17,11 +18,20 @@ export default function Home() {
   const updateTaskStatus = useTaskStore((state) => state.updateTaskStatus);
   const tasks = useTaskStore((state) => state.tasks);
   const userId = useAuthStore((state) => state.userId);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const logout = useAuthStore((state) => state.logout);
+  const router = useRouter();
   
   // New state for view mode
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  useEffect(() => {
+    if (isHydrated && !userId) {
+      router.push("/login");
+    }
+  }, [isHydrated, userId, router]);
 
   useEffect(() => {
     if (userId) fetchTasks();
@@ -50,6 +60,10 @@ export default function Home() {
   const doingTasks = tasks.filter((t) => t.status === "IN_PROGRESS");
   const completedTasks = tasks.filter((t) => t.status === "DONE");
   const onHoldTasks = tasks.filter((t) => t.status === "ON_HOLD");
+
+  if (!isHydrated) {
+    return null; // Prevents hydration mismatch while Zustand loads from localStorage
+  }
 
   return (
     <AppLayout>
@@ -103,6 +117,16 @@ export default function Home() {
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Task
+          </button>
+
+          <button
+            onClick={() => {
+              logout();
+              router.push("/login");
+            }}
+            className="bg-destructive text-destructive-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 flex items-center cursor-pointer border border-border"
+          >
+            Logout
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar, Tag, User, Signal } from "lucide-react";
+import { X, Tag, Signal } from "lucide-react";
 import { Task, useTaskStore } from "../../store/useTaskStore";
 
 interface TaskDetailsModalProps {
@@ -22,6 +22,7 @@ export function TaskDetailsModal({ task, isOpen, onClose }: TaskDetailsModalProp
   // Sync local state when a new task is opened
   useEffect(() => {
     if (task) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(task.title);
       setDescription(task.description || "");
       setPriority(task.priority || "Medium");
