@@ -1,4 +1,4 @@
-import { Plus, MoreHorizontal } from "lucide-react";
+import { Plus, MoreHorizontal, GripVertical } from "lucide-react";
 import { TaskCard } from "./TaskCard";
 import { Task } from "../../store/useTaskStore";
 import { Droppable } from "@hello-pangea/dnd";
@@ -12,25 +12,21 @@ interface TaskColumnProps {
 
 export function TaskColumn({ title, statusId, tasks, onTaskClick }: TaskColumnProps) {
   return (
-    <div className="flex flex-col w-[340px] shrink-0 p-1">
-      <div className="flex justify-between items-center mb-4 px-1">
+    <section className="flex flex-col w-[340px] shrink-0 rounded-[10px] border border-border bg-muted/50 px-2.5 py-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+      <header className="flex items-center justify-between px-2.5 pb-3.5">
         <div className="flex items-center gap-3">
-          <span className="text-muted-foreground/50 text-base cursor-grab">⋮⋮</span>
-
-          <h2 className="font-semibold text-sm text-foreground">{title}</h2>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-            {tasks.length}
-          </span>
+          <GripVertical className="size-5 text-muted-foreground cursor-grab" strokeWidth={2.5} />
+          <h2 className="text-[17px] font-semibold text-foreground">{title}</h2>
         </div>
-        <div className="flex space-x-1">
-          <button className="text-muted-foreground hover:text-foreground p-1">
-            <Plus className="h-4 w-4" />
+        <div className="flex items-center gap-3">
+          <button type="button" aria-label="Add task" className="text-muted-foreground transition-opacity hover:opacity-60">
+            <Plus className="size-5" strokeWidth={2.5} />
           </button>
-          <button className="text-muted-foreground hover:text-foreground p-1">
-            <MoreHorizontal className="h-4 w-4" />
+          <button type="button" aria-label="More list options" className="text-muted-foreground transition-opacity hover:opacity-60">
+            <MoreHorizontal className="size-5" strokeWidth={2.5} />
           </button>
         </div>
-      </div>
+      </header>
 
       <Droppable droppableId={statusId}>
         {(provided) => (
@@ -52,10 +48,10 @@ export function TaskColumn({ title, statusId, tasks, onTaskClick }: TaskColumnPr
         )}
       </Droppable>
 
-      <button className="mt-3 flex items-center text-muted-foreground hover:text-foreground text-sm py-2 px-1 transition-colors w-full cursor-pointer">
-        <Plus className="h-4 w-4 mr-2" />
+      <button type="button" className="mt-3 flex items-center gap-2 px-2.5 pt-0.5 text-[16px] font-medium text-foreground transition-opacity hover:opacity-60">
+        <Plus className="size-[18px]" strokeWidth={2.5} />
         Add Task
       </button>
-    </div>
+    </section>
   );
 }

@@ -1,4 +1,4 @@
-import { MoreHorizontal, Calendar, Tag } from "lucide-react";
+import { MoreHorizontal, CalendarDays, Tag } from "lucide-react";
 import Image from "next/image";
 import { Task } from "../../store/useTaskStore";
 import { Draggable } from "@hello-pangea/dnd";
@@ -11,60 +11,61 @@ interface TaskCardProps {
 
 export function TaskCard({ task, index, onClick }: TaskCardProps) {
   // Mocks for data we haven't added to the DB yet
-  const mockDueDate = task.dueDate || "12 Sep 2026";
+  const mockDueDate = task.dueDate || "29 Jul";
   const mockRole = "Admin";
-  const mockLabel = task.labels?.[0] || "Deployment";
+  // The Figma screenshot shows two tags sometimes, e.g. "Deployment", "Deployment"
+  const mockLabels = task.labels?.length ? task.labels : ["Deployment", "Deployment"];
 
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
-        <div
+        <article
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           onClick={onClick}
-          className={`bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer group flex flex-col gap-3 ${
+          className={`rounded-[11px] border border-border bg-card px-4 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.03)] cursor-pointer transition-shadow hover:shadow-md ${
             snapshot.isDragging ? "shadow-lg opacity-80 rotate-2" : ""
           }`}
           style={{ ...provided.draggableProps.style }}
         >
-          <div className="flex justify-between items-start">
-            <h3 className="font-semibold text-foreground text-[15px] leading-snug line-clamp-2 pr-4">
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="text-[19px] font-medium leading-6 tracking-[-0.02em] text-foreground pr-4 line-clamp-2">
               {task.title}
             </h3>
-            <button className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity p-1 -mr-2 -mt-1">
-              <MoreHorizontal className="h-4 w-4" />
+            <button type="button" aria-label={`More options for ${task.title}`} className="mt-0.5 shrink-0 text-muted-foreground transition-opacity hover:opacity-60">
+              <MoreHorizontal className="size-[19px]" strokeWidth={2.2} />
             </button>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {/* Avatar Placeholder */}
-              <Image
-                src="https://api.dicebear.com/7.x/notionists/svg?seed=Admin&backgroundColor=f43f5e"
-                alt="Admin"
-                width={24}
-                height={24}
-                className="w-6 h-6 rounded-full border border-border bg-primary"
-              />
-              <span className="text-xs font-medium text-foreground">{mockRole}</span>
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 text-[16px] text-foreground">
+              <div className="flex size-6 items-center justify-center overflow-hidden rounded-full border border-border bg-muted" aria-hidden="true">
+                <Image
+                  src="https://api.dicebear.com/7.x/notionists/svg?seed=Admin&backgroundColor=f43f5e"
+                  alt="Admin"
+                  width={24}
+                  height={24}
+                  className="w-full h-full"
+                />
+              </div>
+              <span>{mockRole}</span>
             </div>
-
-            {/* Date Badge */}
-            <div className="flex items-center gap-1.5 bg-[var(--priority-high-bg)] text-[var(--priority-high-fg)] px-2 py-1 rounded-md text-[11px] font-medium border border-[var(--priority-high-bg)]/20">
-              <Calendar className="h-3 w-3" />
+            <div className="flex items-center gap-1.5 rounded-full bg-badge-date-bg px-3 py-1 text-[15px] font-medium text-badge-date-fg">
+              <CalendarDays className="size-4" strokeWidth={2} />
               <span>{mockDueDate}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Label Badge */}
-            <div className="flex items-center gap-1.5 border border-border px-2.5 py-1 rounded-md text-[11px] text-muted-foreground font-medium">
-              <Tag className="h-3 w-3" />
-              <span>{mockLabel}</span>
-            </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {mockLabels.map((tag, i) => (
+              <span key={`${tag}-${i}`} className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[16px] leading-5 text-foreground">
+                <Tag className="size-[16px]" strokeWidth={2.2} />
+                {tag}
+              </span>
+            ))}
           </div>
-        </div>
+        </article>
       )}
     </Draggable>
   );

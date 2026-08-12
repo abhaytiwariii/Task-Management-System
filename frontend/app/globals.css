@@ -3,7 +3,7 @@
 @layer base {
   :root {
     /* BASE THEME */
-    --background: #f4f4f5;
+    --background: #ffffff;
     --foreground: #09090b;
 
     --primary: #09090b;
@@ -16,8 +16,8 @@
     --muted: #f4f4f5;
     --muted-foreground: #71717a;
 
-    --sidebar: #ffffff;
-    --sidebar-hover: #f4f4f5;
+    --sidebar: #f4f4f5;
+    --sidebar-hover: #e4e4e7;
 
     /* DESTRUCTIVE / HIGH PRIORITY */
     --destructive: #e11d48;
