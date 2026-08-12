@@ -32,6 +32,9 @@
     --priority-low-bg: #f1f5f9;
     --priority-low-fg: #475569;
 
+    --popover: #ffffff;
+    --popover-foreground: #09090b;
+
     --badge-date-bg: #ffe4e6;
     --badge-date-fg: #e11d48;
   }
@@ -45,6 +48,9 @@
 
     --card: #18181b;
     --card-foreground: #f4f4f5;
+
+    --popover: #18181b;
+    --popover-foreground: #f4f4f5;
 
     --border: #27272a;
     --muted: #27272a;
@@ -77,6 +83,8 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
