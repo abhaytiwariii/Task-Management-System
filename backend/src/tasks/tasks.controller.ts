@@ -17,8 +17,11 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  findAll(@Query('userId') userId: string) {
-    return this.tasksService.findAll(userId);
+  findAll(
+    @Query('userId') userId: string,
+    @Query('projectId') projectId?: string,
+  ) {
+    return this.tasksService.findAll(userId, projectId);
   }
 
   @Post()

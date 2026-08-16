@@ -7,9 +7,13 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(userId: string) {
+  async findAll(userId: string, projectId?: string) {
+    const where: any = { userId };
+    if (projectId) {
+      where.projectId = projectId;
+    }
     return this.prisma.task.findMany({
-      where: { userId },
+      where,
       orderBy: { createdAt: 'desc' },
     });
   }

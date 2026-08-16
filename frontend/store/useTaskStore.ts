@@ -11,6 +11,7 @@ export interface Task {
   dueDate: string | null;
   labels: string[];
   assignee: string | null;
+  projectId?: string | null;
   createdAt: string;
 }
 
@@ -18,7 +19,7 @@ export interface Task {
 interface TaskState {
   tasks: Task[];
   isLoading: boolean;
-  fetchTasks: () => Promise<void>;
+  fetchTasks: (projectId?: string) => Promise<void>;
   addTask: (data: Partial<Task>) => Promise<void>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   updateTaskStatus: (id: string, newStatus: string) => Promise<void>;
@@ -29,13 +30,16 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
   tasks: [],
   isLoading: false,
 
-  fetchTasks: async () => {
+  fetchTasks: async (projectId?: string) => {
     const userId = useAuthStore.getState().userId;
     if (!userId) return;
 
     set({ isLoading: true });
     try {
-      const response = await api.get(`/tasks?userId=${userId}`);
+      const url = projectId
+        ? `/tasks?userId=${userId}&projectId=${projectId}`
+        : `/tasks?userId=${userId}`;
+      const response = await api.get(url);
       set({ tasks: response.data });
     } catch (error) {
       console.error("Failed to fetch tasks:", error);

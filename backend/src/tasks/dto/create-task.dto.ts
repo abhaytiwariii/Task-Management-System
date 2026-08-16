@@ -31,6 +31,10 @@ export class CreateTaskDto {
   assignee?: string;
 
   @IsString()
+  @IsOptional()
+  projectId?: string;
+
+  @IsString()
   @IsNotEmpty()
   userId: string;
 }

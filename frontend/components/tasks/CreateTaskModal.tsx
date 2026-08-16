@@ -8,12 +8,14 @@ interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultStatus?: string;
+  defaultProjectId?: string;
 }
 
 export function CreateTaskModal({
   isOpen,
   onClose,
   defaultStatus = "TODO",
+  defaultProjectId,
 }: CreateTaskModalProps) {
   const addTask = useTaskStore((state) => state.addTask);
   const [title, setTitle] = useState("");
@@ -31,8 +33,9 @@ export function CreateTaskModal({
       status: defaultStatus,
       priority,
       dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
-      labels: ["Design"], // Hardcoded for now
+      labels: ["Design"],
       assignee: "Guest User",
+      projectId: defaultProjectId || undefined,
     });
 
     setTitle("");
