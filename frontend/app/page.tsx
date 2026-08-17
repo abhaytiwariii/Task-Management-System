@@ -41,7 +41,13 @@ export default function Home() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalDefaultStatus, setModalDefaultStatus] = useState("TODO");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const handleOpenAddTaskModal = (statusId: string = "TODO") => {
+    setModalDefaultStatus(statusId);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     if (isHydrated && !userId) {
@@ -150,7 +156,7 @@ export default function Home() {
           {/* Add Task Primary Action Button matching Figma SS2 */}
           <button
             type="button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => handleOpenAddTaskModal("TODO")}
             className="bg-foreground text-background px-3.5 py-1.5 rounded-lg text-xs font-medium hover:opacity-90 flex items-center shadow-2xs transition-opacity cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5 mr-1.5" />
@@ -174,10 +180,10 @@ export default function Home() {
       {viewMode === "board" ? (
         <BoardDndContext onDragEnd={handleDragEnd}>
           <div className="flex space-x-5 overflow-x-auto pb-4 h-[calc(100vh-180px)] items-start">
-            <TaskColumn title="To Do" statusId="TODO" tasks={todoTasks} onTaskClick={setSelectedTask} />
-            <TaskColumn title="Doing" statusId="IN_PROGRESS" tasks={doingTasks} onTaskClick={setSelectedTask} />
-            <TaskColumn title="Completed" statusId="DONE" tasks={completedTasks} onTaskClick={setSelectedTask} />
-            <TaskColumn title="On Hold" statusId="ON_HOLD" tasks={onHoldTasks} onTaskClick={setSelectedTask} />
+            <TaskColumn title="To Do" statusId="TODO" tasks={todoTasks} onTaskClick={setSelectedTask} onAddTask={handleOpenAddTaskModal} />
+            <TaskColumn title="Doing" statusId="IN_PROGRESS" tasks={doingTasks} onTaskClick={setSelectedTask} onAddTask={handleOpenAddTaskModal} />
+            <TaskColumn title="Completed" statusId="DONE" tasks={completedTasks} onTaskClick={setSelectedTask} onAddTask={handleOpenAddTaskModal} />
+            <TaskColumn title="On Hold" statusId="ON_HOLD" tasks={onHoldTasks} onTaskClick={setSelectedTask} onAddTask={handleOpenAddTaskModal} />
           </div>
         </BoardDndContext>
       ) : (
@@ -185,13 +191,14 @@ export default function Home() {
           tasks={filteredTasks} 
           onTaskClick={setSelectedTask} 
           visibleFields={visibleFields}
-          onAddTask={() => setIsModalOpen(true)}
+          onAddTask={() => handleOpenAddTaskModal("TODO")}
         />
       )}
 
       {/* Create Task Modal */}
       <CreateTaskModal
         isOpen={isModalOpen}
+        defaultStatus={modalDefaultStatus}
         onClose={() => setIsModalOpen(false)}
       />
 

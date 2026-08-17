@@ -23,6 +23,7 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
   const [dummyViewMode, setDummyViewMode] = useState<"board" | "list">("list");
 
   // Dynamic Fields visibility state for Projects table matching SS9/SS11
@@ -62,6 +63,16 @@ export default function ProjectsPage() {
       ...prev,
       [fieldKey]: !prev[fieldKey],
     }));
+  };
+
+  const handleOpenAddModal = () => {
+    setProjectToEdit(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (project: Project) => {
+    setProjectToEdit(project);
+    setIsModalOpen(true);
   };
 
   const formatDate = (isoString: string | null) => {
@@ -123,7 +134,7 @@ export default function ProjectsPage() {
           {/* Add Project Action Button */}
           <button
             type="button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleOpenAddModal}
             className="bg-foreground text-background px-3.5 py-1.5 rounded-lg text-xs font-medium hover:opacity-90 flex items-center shadow-2xs transition-opacity cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5 mr-1.5" />
@@ -198,7 +209,9 @@ export default function ProjectsPage() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => handleOpenEditModal(project)}
                     className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    title="Edit project details"
                   >
                     <MoreHorizontal className="h-3.5 w-3.5" />
                   </button>
@@ -211,7 +224,7 @@ export default function ProjectsPage() {
           <div className="px-4 py-3">
             <button
               type="button"
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleOpenAddModal}
               className="flex items-center text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5 mr-1.5" />
@@ -221,10 +234,11 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Create Project Modal */}
+      {/* Create / Edit Project Modal */}
       <CreateProjectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        projectToEdit={projectToEdit}
       />
     </AppLayout>
   );

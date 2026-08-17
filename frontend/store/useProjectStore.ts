@@ -19,6 +19,7 @@ interface ProjectState {
   isLoading: boolean;
   fetchProjects: () => Promise<void>;
   addProject: (data: { name: string; priority?: string; lead?: string; dueDate?: string }) => Promise<Project | undefined>;
+  updateProject: (id: string, data: { name?: string; priority?: string; lead?: string; dueDate?: string }) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
 }
 
@@ -51,6 +52,17 @@ export const useProjectStore = create<ProjectState>()((set) => ({
       return response.data;
     } catch (error) {
       console.error("Failed to add project:", error);
+    }
+  },
+
+  updateProject: async (id, data) => {
+    try {
+      const response = await api.patch(`/projects/${id}`, data);
+      set((state) => ({
+        projects: state.projects.map((p) => (p.id === id ? response.data : p)),
+      }));
+    } catch (error) {
+      console.error("Failed to update project:", error);
     }
   },
 

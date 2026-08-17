@@ -1,24 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, Calendar } from "lucide-react";
-import { useProjectStore } from "../../store/useProjectStore";
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { useProjectStore, Project } from "../../store/useProjectStore";
 import { PriorityPopover } from "../tasks/PriorityPopover";
 import { PriorityLevel } from "../tasks/PrioritySignalIcon";
+import { CustomDatePicker } from "../common/CustomDatePicker";
 
 interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
+  projectToEdit?: Project | null;
 }
 
-export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps) {
+export function CreateProjectModal({ isOpen, onClose, projectToEdit }: CreateProjectModalProps) {
   const addProject = useProjectStore((state) => state.addProject);
+  const updateProject = useProjectStore((state) => state.updateProject);
 
   const [name, setName] = useState("");
   const [priority, setPriority] = useState<PriorityLevel>("Medium");
   const [lead, setLead] = useState("Admin");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState<Date | null>(() => new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (projectToEdit) {
+      setName(projectToEdit.name || "");
+      setPriority((projectToEdit.priority as PriorityLevel) || "Medium");
+      setLead(projectToEdit.lead || "Admin");
+      setDueDate(projectToEdit.dueDate ? new Date(projectToEdit.dueDate) : new Date());
+    } else {
+      setName("");
+      setPriority("Medium");
+      setLead("Admin");
+      setDueDate(new Date());
+    }
+  }, [projectToEdit, isOpen]);
 
   if (!isOpen) return null;
 
@@ -28,30 +45,39 @@ export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps)
 
     setIsSubmitting(true);
     try {
-      await addProject({
-        name: name.trim(),
-        priority: priority || "Medium",
-        lead: lead.trim() || "Admin",
-        dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
-      });
-      setName("");
-      setPriority("Medium");
-      setLead("Admin");
-      setDueDate("");
+      if (projectToEdit) {
+        await updateProject(projectToEdit.id, {
+          name: name.trim(),
+          priority: priority || "Medium",
+          lead: lead.trim() || "Admin",
+          dueDate: dueDate ? dueDate.toISOString() : undefined,
+        });
+      } else {
+        await addProject({
+          name: name.trim(),
+          priority: priority || "Medium",
+          lead: lead.trim() || "Admin",
+          dueDate: dueDate ? dueDate.toISOString() : undefined,
+        });
+      }
       onClose();
     } catch (err) {
-      console.error("Failed to create project:", err);
+      console.error("Failed to save project:", err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const isEditing = !!projectToEdit;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in-50">
-      <div className="bg-popover text-popover-foreground rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-border">
+      <div className="bg-popover text-popover-foreground rounded-2xl shadow-2xl w-full max-w-md border border-border relative">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-base font-semibold text-foreground">Add Project</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            {isEditing ? "Edit Project" : "Add Project"}
+          </h2>
           <button
             type="button"
             onClick={onClose}
@@ -71,7 +97,7 @@ export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps)
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Design Homepage"
               required
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full px-3 py-2 border border-border rounded-xl bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
@@ -82,6 +108,7 @@ export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps)
                 <PriorityPopover
                   currentPriority={priority}
                   onSelectPriority={(p) => setPriority(p)}
+                  fullWidth={true}
                 />
               </div>
             </div>
@@ -93,18 +120,16 @@ export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps)
                 value={lead}
                 onChange={(e) => setLead(e.target.value)}
                 placeholder="e.g. Admin"
-                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full px-3 py-2 border border-border rounded-xl bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="font-medium text-foreground">Due Date</label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+            <CustomDatePicker
+              selectedDate={dueDate}
+              onSelectDate={(d) => setDueDate(d)}
             />
           </div>
 
@@ -113,16 +138,16 @@ export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps)
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className="px-4 py-2 rounded-lg bg-foreground text-background font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-foreground text-background font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
             >
-              {isSubmitting ? "Creating..." : "Create Project"}
+              {isSubmitting ? "Saving..." : isEditing ? "Save Changes" : "Create Project"}
             </button>
           </div>
         </form>
