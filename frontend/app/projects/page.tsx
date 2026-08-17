@@ -9,11 +9,13 @@ import { useProjectStore, Project } from "../../store/useProjectStore";
 import { PrioritySignalIcon } from "../../components/tasks/PrioritySignalIcon";
 import { FieldsPopover, FieldsState } from "../../components/tasks/FieldsPopover";
 import { CreateProjectModal } from "../../components/projects/CreateProjectModal";
+import { ProjectsTableSkeleton } from "../../components/common/Skeletons";
 import { Search, Filter, Plus, MoreHorizontal, Trash2 } from "lucide-react";
 
 export default function ProjectsPage() {
   const fetchProjects = useProjectStore((state) => state.fetchProjects);
   const projects = useProjectStore((state) => state.projects);
+  const isLoading = useProjectStore((state) => state.isLoading);
   const deleteProject = useProjectStore((state) => state.deleteProject);
   const userId = useAuthStore((state) => state.userId);
   const isHydrated = useAuthStore((state) => state.isHydrated);
@@ -144,95 +146,99 @@ export default function ProjectsPage() {
       </div>
 
       {/* Projects Overview Table matching Figma SS9 & SS11 */}
-      <div className="border border-border rounded-xl bg-card overflow-hidden shadow-2xs">
-        <div className="flex items-center gap-4 px-4 py-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground">
-          <div className="flex-1 min-w-[200px]">Projects</div>
-          {visibleFields.priority && <div className="w-28 shrink-0">Priority</div>}
-          {visibleFields.members && <div className="w-24 shrink-0">Lead</div>}
-          {visibleFields.dueDate && <div className="w-28 shrink-0">Due Date</div>}
-          <div className="w-12 text-right shrink-0">Actions</div>
-        </div>
+      {isLoading && projects.length === 0 ? (
+        <ProjectsTableSkeleton />
+      ) : (
+        <div className="border border-border rounded-xl bg-card overflow-hidden shadow-2xs">
+          <div className="flex items-center gap-4 px-4 py-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground">
+            <div className="flex-1 min-w-[200px]">Projects</div>
+            {visibleFields.priority && <div className="w-28 shrink-0">Priority</div>}
+            {visibleFields.members && <div className="w-24 shrink-0">Lead</div>}
+            {visibleFields.dueDate && <div className="w-28 shrink-0">Due Date</div>}
+            <div className="w-12 text-right shrink-0">Actions</div>
+          </div>
 
-        <div className="divide-y divide-border">
-          {filteredProjects.length === 0 ? (
-            <div className="p-8 text-center text-xs text-muted-foreground">
-              No projects found. Click "+ Add Project" to create one.
-            </div>
-          ) : (
-            filteredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="flex items-center gap-4 px-4 py-3 text-xs hover:bg-muted/30 transition-colors"
-              >
-                {/* Project Title / Link to Project Tasks View (SS12) */}
-                <div className="flex-1 min-w-[200px] font-medium text-foreground truncate">
-                  <Link
-                    href={`/projects/${project.id}`}
-                    className="hover:underline text-primary cursor-pointer"
-                  >
-                    {project.name}
-                  </Link>
-                </div>
-
-                {/* Priority */}
-                {visibleFields.priority && (
-                  <div className="w-28 shrink-0">
-                    <PrioritySignalIcon priority={project.priority} />
-                  </div>
-                )}
-
-                {/* Lead */}
-                {visibleFields.members && (
-                  <div className="w-24 shrink-0 flex items-center">
-                    <div className="h-6 w-6 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-[10px] font-bold">
-                      {project.lead ? project.lead.charAt(0).toUpperCase() : "A"}
-                    </div>
-                  </div>
-                )}
-
-                {/* Due Date */}
-                {visibleFields.dueDate && (
-                  <div className="w-28 shrink-0 text-muted-foreground">
-                    {formatDate(project.dueDate)}
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="w-12 flex justify-end shrink-0 space-x-1">
-                  <button
-                    type="button"
-                    onClick={() => deleteProject(project.id)}
-                    className="p-1 rounded-md text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                    title="Delete project"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEditModal(project)}
-                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                    title="Edit project details"
-                  >
-                    <MoreHorizontal className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+          <div className="divide-y divide-border">
+            {filteredProjects.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground">
+                No projects found. Click "+ Add Project" to create one.
               </div>
-            ))
-          )}
+            ) : (
+              filteredProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="flex items-center gap-4 px-4 py-3 text-xs hover:bg-muted/30 transition-colors"
+                >
+                  {/* Project Title / Link to Project Tasks View (SS12) */}
+                  <div className="flex-1 min-w-[200px] font-medium text-foreground truncate">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="hover:underline text-primary cursor-pointer"
+                    >
+                      {project.name}
+                    </Link>
+                  </div>
 
-          {/* Inline Add Project Action matching Figma SS9 */}
-          <div className="px-4 py-3">
-            <button
-              type="button"
-              onClick={handleOpenAddModal}
-              className="flex items-center text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer"
-            >
-              <Plus className="h-3.5 w-3.5 mr-1.5" />
-              <span>Add Projects</span>
-            </button>
+                  {/* Priority */}
+                  {visibleFields.priority && (
+                    <div className="w-28 shrink-0">
+                      <PrioritySignalIcon priority={project.priority} />
+                    </div>
+                  )}
+
+                  {/* Lead */}
+                  {visibleFields.members && (
+                    <div className="w-24 shrink-0 flex items-center">
+                      <div className="h-6 w-6 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-[10px] font-bold">
+                        {project.lead ? project.lead.charAt(0).toUpperCase() : "A"}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Due Date */}
+                  {visibleFields.dueDate && (
+                    <div className="w-28 shrink-0 text-muted-foreground">
+                      {formatDate(project.dueDate)}
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="w-12 flex justify-end shrink-0 space-x-1">
+                    <button
+                      type="button"
+                      onClick={() => deleteProject(project.id)}
+                      className="p-1 rounded-md text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                      title="Delete project"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(project)}
+                      className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                      title="Edit project details"
+                    >
+                      <MoreHorizontal className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+
+            {/* Inline Add Project Action matching Figma SS9 */}
+            <div className="px-4 py-3">
+              <button
+                type="button"
+                onClick={handleOpenAddModal}
+                className="flex items-center text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                <span>Add Projects</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Create / Edit Project Modal */}
       <CreateProjectModal

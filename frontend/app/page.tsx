@@ -11,6 +11,7 @@ import { CreateTaskModal } from "../components/tasks/CreateTaskModal";
 import { TaskDetailsModal } from "../components/tasks/TaskDetailsModal";
 import { BoardDndContext } from "../components/tasks/BoardDndContext";
 import { FieldsPopover, FieldsState } from "../components/tasks/FieldsPopover";
+import { BoardSkeleton, ListSkeleton } from "../components/common/Skeletons";
 import { Filter, Search, Plus } from "lucide-react";
 import { DropResult } from "@hello-pangea/dnd";
 
@@ -18,6 +19,7 @@ export default function Home() {
   const fetchTasks = useTaskStore((state) => state.fetchTasks);
   const updateTaskStatus = useTaskStore((state) => state.updateTaskStatus);
   const tasks = useTaskStore((state) => state.tasks);
+  const isLoading = useTaskStore((state) => state.isLoading);
   const userId = useAuthStore((state) => state.userId);
   const isHydrated = useAuthStore((state) => state.isHydrated);
   const logout = useAuthStore((state) => state.logout);
@@ -176,8 +178,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Conditional View Rendering (Board vs List) */}
-      {viewMode === "board" ? (
+      {/* Conditional Loading vs Rendered Content */}
+      {isLoading && tasks.length === 0 ? (
+        viewMode === "board" ? <BoardSkeleton /> : <ListSkeleton />
+      ) : viewMode === "board" ? (
         <BoardDndContext onDragEnd={handleDragEnd}>
           <div className="flex space-x-5 overflow-x-auto pb-4 h-[calc(100vh-180px)] items-start">
             <TaskColumn title="To Do" statusId="TODO" tasks={todoTasks} onTaskClick={setSelectedTask} onAddTask={handleOpenAddTaskModal} />
