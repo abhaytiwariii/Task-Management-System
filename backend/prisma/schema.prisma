@@ -10,41 +10,41 @@ datasource db {
 
 model User {
   id        String    @id @default(uuid())
-  email     String?   @unique
-  name      String?
-  googleId  String?   @unique
   isGuest   Boolean   @default(true)
-  tasks     Task[]
-  projects  Project[]
   createdAt DateTime  @default(now())
+  email     String?   @unique
+  googleId  String?   @unique
+  name      String?
+  projects  Project[]
+  tasks     Task[]
 }
 
 model Project {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  priority  String?  @default("Medium")
-  lead      String?  @default("Admin")
+  priority  String?   @default("Medium")
+  lead      String?   @default("Admin")
   dueDate   DateTime?
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
   tasks     Task[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Task {
   id          String    @id @default(uuid())
   title       String
   description String?
-  status      String    @default("TODO") // e.g., TODO, IN_PROGRESS, DONE
-  priority    String?   // e.g., LOW, MEDIUM, HIGH
-  dueDate     DateTime? // Added for the date badge
-  labels      String[]  @default([]) // Added for tags like "Deployment"
-  assignee    String?   // Added for the member avatar
+  status      String    @default("TODO")
+  priority    String?
   userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  projectId   String?
-  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  assignee    String?
+  dueDate     DateTime?
+  labels      String[]  @default([])
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 }
