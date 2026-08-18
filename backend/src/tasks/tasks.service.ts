@@ -19,6 +19,15 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto) {
+    if (createTaskDto.projectId) {
+      const project = await this.prisma.project.findFirst({
+        where: { id: createTaskDto.projectId, userId: createTaskDto.userId },
+      });
+      if (!project) {
+        throw new NotFoundException(`Project with ID ${createTaskDto.projectId} not found or does not belong to user`);
+      }
+    }
+
     return this.prisma.task.create({
       data: createTaskDto,
     });
@@ -29,6 +38,16 @@ export class TasksService {
     if (!existing) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
+
+    if (updateTaskDto.projectId) {
+      const project = await this.prisma.project.findFirst({
+        where: { id: updateTaskDto.projectId, userId: existing.userId },
+      });
+      if (!project) {
+        throw new NotFoundException(`Project with ID ${updateTaskDto.projectId} not found or does not belong to user`);
+      }
+    }
+
     return this.prisma.task.update({
       where: { id },
       data: updateTaskDto,

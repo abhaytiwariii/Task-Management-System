@@ -29,5 +29,9 @@ export class UpdateTaskDto {
   @IsString()
   @IsOptional()
   assignee?: string;
+
+  @IsString()
+  @IsOptional()
+  projectId?: string;
 }
 

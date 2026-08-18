@@ -22,8 +22,8 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(id);
+  findOne(@Param('id') id: string, @Query('userId') userId?: string) {
+    return this.projectsService.findOne(id, userId);
   }
 
   @Post()
@@ -32,12 +32,16 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(id, updateProjectDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @Query('userId') userId?: string,
+  ) {
+    return this.projectsService.update(id, updateProjectDto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(id);
+  remove(@Param('id') id: string, @Query('userId') userId?: string) {
+    return this.projectsService.remove(id, userId);
   }
 }

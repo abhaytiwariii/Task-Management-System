@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -20,15 +20,24 @@ export class ProjectsService {
     });
   }
 
-  async findOne(id: string) {
-    return this.prisma.project.findUnique({
-      where: { id },
+  async findOne(id: string, userId?: string) {
+    const where: any = { id };
+    if (userId) where.userId = userId;
+
+    const project = await this.prisma.project.findFirst({
+      where,
       include: {
         tasks: {
           orderBy: { createdAt: 'desc' },
         },
       },
     });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found or unauthorized`);
+    }
+
+    return project;
   }
 
   async create(createProjectDto: CreateProjectDto) {
@@ -43,7 +52,15 @@ export class ProjectsService {
     });
   }
 
-  async update(id: string, updateProjectDto: UpdateProjectDto) {
+  async update(id: string, updateProjectDto: UpdateProjectDto, userId?: string) {
+    const where: any = { id };
+    if (userId) where.userId = userId;
+
+    const existing = await this.prisma.project.findFirst({ where });
+    if (!existing) {
+      throw new NotFoundException(`Project with ID ${id} not found or unauthorized`);
+    }
+
     const data: any = { ...updateProjectDto };
     if (data.dueDate) {
       data.dueDate = new Date(data.dueDate);
@@ -54,7 +71,15 @@ export class ProjectsService {
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId?: string) {
+    const where: any = { id };
+    if (userId) where.userId = userId;
+
+    const existing = await this.prisma.project.findFirst({ where });
+    if (!existing) {
+      throw new NotFoundException(`Project with ID ${id} not found or unauthorized`);
+    }
+
     return this.prisma.project.delete({
       where: { id },
     });
