@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { LayoutGrid, FolderKanban, Settings, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { ThemeToggle } from "../ThemeToggle";
+import { UserProfileDropdown } from "./UserProfileDropdown";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -16,24 +17,14 @@ export function Sidebar() {
   return (
     <aside className="w-64 border-r border-border bg-sidebar text-foreground flex flex-col h-full py-4 shrink-0">
       <div className="flex flex-col gap-6 px-4">
-        {/* User Profile Header matching Figma SS2 */}
-        <div className="flex items-center justify-between cursor-pointer hover:bg-sidebar-hover p-2 rounded-lg transition-colors -mx-2">
-          <div className="flex items-center gap-3">
-            <Image
-              src="https://api.dicebear.com/7.x/notionists/svg?seed=Dexter&backgroundColor=b6e3f4"
-              alt="Dexter"
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded-full border border-border"
-            />
-            <span className="font-medium text-sm">Dexter</span>
-          </div>
-          <ChevronDown className="w-4 h-4 text-muted-foreground" />
-        </div>
+        {/* User Profile Dropdown Header matching Figma SS10 */}
+        <UserProfileDropdown />
 
         {/* Navigation Items */}
         <nav className="flex flex-col gap-1 -mx-2">
-          <div className="text-xs font-medium text-muted-foreground mb-1 px-3">Workspace</div>
+          <div className="text-xs font-medium text-muted-foreground mb-1 px-3">
+            Workspace
+          </div>
           <Link
             href="/"
             className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -42,7 +33,9 @@ export function Sidebar() {
                 : "text-muted-foreground hover:bg-sidebar-hover hover:text-foreground"
             }`}
           >
-            <LayoutGrid className={`w-4 h-4 ${isTasksActive ? "text-foreground" : "text-muted-foreground"}`} />
+            <LayoutGrid
+              className={`w-4 h-4 ${isTasksActive ? "text-foreground" : "text-muted-foreground"}`}
+            />
             <span>Tasks</span>
           </Link>
 
@@ -54,7 +47,9 @@ export function Sidebar() {
                 : "text-muted-foreground hover:bg-sidebar-hover hover:text-foreground"
             }`}
           >
-            <FolderKanban className={`w-4 h-4 ${isProjectsActive ? "text-foreground" : "text-muted-foreground"}`} />
+            <FolderKanban
+              className={`w-4 h-4 ${isProjectsActive ? "text-foreground" : "text-muted-foreground"}`}
+            />
             <span>Projects</span>
           </Link>
         </nav>
@@ -62,14 +57,16 @@ export function Sidebar() {
 
       <div className="mt-auto px-2">
         <div className="flex items-center justify-between border-t border-border pt-4 px-2">
-          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground">
+          <Link
+            href="/settings"
+            className="flex items-center gap-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+          >
             <Settings className="w-4 h-4" />
             <span>Settings</span>
-          </div>
+          </Link>
           <ThemeToggle />
         </div>
       </div>
     </aside>
   );
 }
-

@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { GuestInit } from "../components/GuestInit";
 
+import { ColorModeProvider } from "../context/ColorModeContext";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -25,12 +27,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <GuestInit />
-          {children}
+          <ColorModeProvider>
+            <GuestInit />
+            {children}
+          </ColorModeProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
-
-
